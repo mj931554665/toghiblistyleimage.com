@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>To Ghibli Style Image</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --primary-light: #FFE3E3;
+            --primary-dark: #FF5252;
+            --bg-color: #FFF5F5;
+            --container-bg: #FFFFFF;
+            --text-color: #4A4A4A;
+            --border-radius: 20px;
+            --shadow: 0 4px 15px rgba(255, 107, 107, 0.1);
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            font-size: 28px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.1);
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 80px;
+        }
+        .message {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 16px;
+            background: var(--primary-light);
+            word-break: break-word;
+            transition: transform 0.2s ease;
+        }
+        .message:hover {
+            transform: translateY(-2px);
+        }
+        .message.user {
+            background: var(--primary-color);
+            color: white;
+        }
+        .message.ai {
+            background: var(--primary-light);
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+        }
+        .message.user .avatar {
+            background: white;
+            color: var(--primary-color);
+        }
+        .message-content {
+            flex: 1;
+            overflow-wrap: break-word;
+        }
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--container-bg);
+            padding: 16px;
+            box-shadow: 0 -4px 15px rgba(255, 107, 107, 0.1);
+            z-index: 1000;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+        }
+        .upload-button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        .input-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--primary-light);
+            border-radius: 16px;
+            min-height: 44px;
+            max-height: 120px;
+            resize: none;
+            background-color: white;
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 16px;
+            display: none;
+            object-fit: contain;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+            font-family: 'Quicksand', sans-serif;
+        }
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .presets {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+        .preset-button {
+            background: var(--primary-light);
+            border: none;
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
+            font-family: 'Quicksand', sans-serif;
+            flex-shrink: 0;
+        }
+        .preset-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .loading {
+            text-align: center;
+            color: var(--primary-color);
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .error-message {
+            color: #FF5252;
+            padding: 12px 16px;
+            background-color: #FFE3E3;
+            border-radius: 12px;
+            margin: 10px 0;
+            border: 2px solid #FFE3E3;
+            font-weight: 500;
+        }
+        .generated-image {
+            max-width: 100%;
+            height: auto;
+            margin: 12px 0;
+            border-radius: 16px;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                height: 100vh;
+                height: -webkit-fill-available;
+                overflow: hidden;
+            }
+            .container {
+                padding: 16px;
+                height: calc(100vh - 180px);
+                height: calc(-webkit-fill-available - 180px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0;
+                border-radius: 0;
+            }
+            h1 {
+                font-size: 24px;
+                margin-bottom: 12px;
+                padding: 0 8px;
+            }
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 16px;
+                padding: 0 8px;
+            }
+            .message {
+                padding: 12px;
+                margin: 0 4px;
+            }
+            .avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .input-container {
+                padding: 12px 16px;
+                background: var(--container-bg);
+                border-top: 1px solid var(--primary-light);
+            }
+            .input-wrapper {
+                gap: 10px;
+            }
+            .upload-button {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .input-box {
+                gap: 8px;
+            }
+            textarea {
+                padding: 10px 14px;
+                font-size: 16px;
+                min-height: 40px;
+                border-width: 1.5px;
+                border-radius: 12px;
+            }
+            .presets {
+                gap: 8px;
+                margin-top: 6px;
+                padding: 4px 2px;
+                mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent);
+            }
+            .preset-button {
+                padding: 6px 12px;
+                font-size: 13px;
+                border-radius: 16px;
+                background: var(--primary-light);
+                color: var(--primary-color);
+                font-weight: 500;
+            }
+            .preset-button:active {
+                transform: scale(0.95);
+                background: var(--primary-color);
+                color: white;
+            }
+            .send-button {
+                padding: 10px 16px;
+                font-size: 15px;
+                border-radius: 12px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .preview-image {
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 16px;
+            }
+            .generated-image {
+                max-width: 100%;
+                margin: 8px 0;
+                border-radius: 16px;
+            }
+            .message-content img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 16px;
+                margin: 8px 0;
+            }
+            /* 添加触摸反馈效果 */
+            .preset-button:active,
+            .send-button:active,
+            .upload-button:active {
+                transform: scale(0.98);
+            }
+            /* 优化滚动条 */
+            .chat-container::-webkit-scrollbar {
+                width: 4px;
+            }
+            .chat-container::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .chat-container::-webkit-scrollbar-thumb {
+                background: var(--primary-light);
+                border-radius: 2px;
+            }
+            /* 添加安全区域支持 */
+            @supports (padding: max(0px)) {
+                .input-container {
+                    padding-bottom: max(12px, env(safe-area-inset-bottom));
+                }
+            }
+        }
+
+        /* 添加深色模式支持 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1A1A1A;
+                --container-bg: #2D2D2D;
+                --text-color: #FFFFFF;
+                --primary-light: rgba(255, 107, 107, 0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To Ghibli Style Image</h1>
+        <div class="subtitle">Transform your images into magical Ghibli-style artwork</div>
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai">
+                <div class="avatar">AI</div>
+                <div class="message-content">
+                    Welcome to the magical world of Ghibli! Upload an image or describe what you want to create, and I'll transform it into the enchanting style of Studio Ghibli. Let's create something magical together!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input type="file" id="imageInput" accept="image/*" style="display: none" onchange="handleImageUpload(event)">
+            <button class="upload-button" onclick="document.getElementById('imageInput').click()">+</button>
+            <div class="input-box">
+                <textarea id="prompt" placeholder="Describe your magical scene or upload an image to transform into Ghibli style..."></textarea>
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <div class="presets">
+                    <button class="preset-button" onclick="applyPreset('totoro')">🐱 Totoro Style</button>
+                    <button class="preset-button" onclick="applyPreset('spirited')">👻 Spirited Away</button>
+                    <button class="preset-button" onclick="applyPreset('howl')">🏰 Howl's Moving Castle</button>
+                    <button class="preset-button" onclick="applyPreset('kiki')">🧹 Kiki's Delivery</button>
+                    <button class="preset-button" onclick="applyPreset('ponyo')">🐟 Ponyo Style</button>
+                </div>
+            </div>
+            <button class="send-button" onclick="sendMessage()">Transform</button>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyD-hA39Ag2kcJ-W7hNZDEhi2CJlHbNUsyg';
+        let currentImageBase64 = null;
+
+        // 添加移动端优化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 防止iOS键盘弹出时页面变形
+            const viewport = document.querySelector('meta[name=viewport]');
+            viewport.setAttribute('content', viewport.content + ', height=' + window.innerHeight);
+            
+            // 优化移动端输入框体验
+            const textarea = document.getElementById('prompt');
+            textarea.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+
+            // 添加触摸反馈
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 优化图片预览
+            const previewImage = document.getElementById('previewImage');
+            previewImage.addEventListener('load', function() {
+                this.style.display = 'block';
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            // 添加移动端手势支持
+            let touchStartY = 0;
+            let touchEndY = 0;
+            const chatContainer = document.getElementById('chatContainer');
+
+            chatContainer.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+            });
+
+            chatContainer.addEventListener('touchmove', function(e) {
+                touchEndY = e.touches[0].clientY;
+            });
+
+            chatContainer.addEventListener('touchend', function() {
+                const diff = touchStartY - touchEndY;
+                if (Math.abs(diff) > 50) { // 如果滑动距离超过50px
+                    if (diff > 0) { // 向上滑动
+                        textarea.focus();
+                    }
+                }
+            });
+        });
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // 检查文件大小
+                if (file.size > 5 * 1024 * 1024) { // 5MB限制
+                    alert('图片大小不能超过5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImage = document.getElementById('previewImage');
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    currentImageBase64 = e.target.result.split(',')[1];
+                    
+                    // 移动端自动滚动到预览图
+                    if (window.innerWidth <= 768) {
+                        previewImage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyPreset(style) {
+            const presets = {
+                totoro: currentImageBase64 ? 
+                    "Transform this image into the magical world of My Neighbor Totoro. Add soft, dreamy atmosphere, lush green landscapes, and the iconic Totoro-style character design" :
+                    "Create an image inspired by My Neighbor Totoro with magical forest elements, soft lighting, and whimsical character design",
+                spirited: currentImageBase64 ?
+                    "Transform this image into the mystical world of Spirited Away. Add ethereal elements, traditional Japanese architecture, and the signature Ghibli magical atmosphere" :
+                    "Create an image inspired by Spirited Away with mystical elements, bathhouse architecture, and magical creatures",
+                howl: currentImageBase64 ?
+                    "Transform this image into the steampunk world of Howl's Moving Castle. Add magical mechanical elements, floating islands, and the characteristic Ghibli fantasy style" :
+                    "Create an image inspired by Howl's Moving Castle with steampunk elements, magical architecture, and fantasy atmosphere",
+                kiki: currentImageBase64 ?
+                    "Transform this image into the charming world of Kiki's Delivery Service. Add European-style architecture, flying elements, and the signature Ghibli slice-of-life style" :
+                    "Create an image inspired by Kiki's Delivery Service with European town elements, flying scenes, and cozy atmosphere",
+                ponyo: currentImageBase64 ?
+                    "Transform this image into the underwater world of Ponyo. Add ocean elements, magical sea creatures, and the vibrant, playful Ghibli style" :
+                    "Create an image inspired by Ponyo with underwater elements, magical sea creatures, and playful atmosphere"
+            };
+            const prompt = document.getElementById('prompt');
+            prompt.value = presets[style] + (prompt.value ? "\n" + prompt.value : "");
+            
+            // 移动端自动聚焦到输入框
+            if (window.innerWidth <= 768) {
+                prompt.focus();
+            }
+        }
+
+        function addMessage(content, isUser = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.innerHTML = `
+                <div class="avatar">${isUser ? 'U' : 'AI'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            
+            // 优化滚动体验
+            setTimeout(() => {
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+        }
+
+        async function sendMessage() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('请输入内容！');
+                return;
+            }
+
+            // 保存当前图片数据
+            const imageToEdit = currentImageBase64;
+
+            // 添加用户消息
+            let userMessage = prompt;
+            if (imageToEdit) {
+                userMessage = `<img src="data:image/jpeg;base64,${imageToEdit}" style="max-width: 200px; border-radius: 5px;"><br>${prompt}`;
+            }
+            addMessage(userMessage, true);
+
+            // 清空输入
+            document.getElementById('prompt').value = '';
+            document.getElementById('previewImage').style.display = 'none';
+            currentImageBase64 = null;
+
+            // 添加加载消息
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai';
+            loadingDiv.innerHTML = `
+                <div class="avatar">AI</div>
+                <div class="message-content">
+                    <div class="loading">${imageToEdit ? '正在处理图片' : '正在生成图片'}，请稍候...</div>
+                </div>
+            `;
+            document.getElementById('chatContainer').appendChild(loadingDiv);
+            
+            // 优化滚动体验
+            setTimeout(() => {
+                loadingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+
+            try {
+                // 构建请求体
+                const requestBody = {
+                    contents: [{
+                        parts: [
+                            { text: prompt }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        responseModalities: ["Text", "Image"]
+                    }
+                };
+
+                // 如果有图片，添加图片数据
+                if (imageToEdit) {
+                    requestBody.contents[0].parts.push({
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: imageToEdit
+                        }
+                    });
+                }
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message || '生成失败');
+                }
+
+                const parts = data.candidates?.[0]?.content?.parts;
+                if (!parts || parts.length === 0) {
+                    throw new Error('无效的响应格式');
+                }
+
+                // 移除加载消息
+                loadingDiv.remove();
+
+                // 添加AI响应
+                let aiResponse = '';
+                const imagePart = parts.find(part => part.inlineData?.mimeType === 'image/png');
+                if (imagePart?.inlineData?.data) {
+                    aiResponse += `<img src="data:image/png;base64,${imagePart.inlineData.data}" class="generated-image">`;
+                }
+
+                const textPart = parts.find(part => part.text);
+                if (textPart?.text) {
+                    aiResponse += `<div style="margin-top: 10px;">${textPart.text}</div>`;
+                }
+
+                addMessage(aiResponse);
+
+            } catch (error) {
+                console.error('生成错误:', error);
+                loadingDiv.innerHTML = `
+                    <div class="avatar">AI</div>
+                    <div class="message-content">
+                        <div class="error-message">
+                            ${imageToEdit ? '处理' : '生成'}失败: ${error.message || '请稍后重试'}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 添加回车发送功能
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
